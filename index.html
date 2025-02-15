@@ -1,0 +1,1357 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>checkcalendar</title>
+   <link rel="shortcut icon" href="https://pngimg.com/d/porsche_PNG10622.png" sizes="16x16 32x32 64x64" />
+    <link rel="apple-touch-icon" href="https://pngimg.com/d/porsche_PNG10622.png" sizes="180x180" />
+  
+    
+  
+    <!-- Tailwind CSS CDN -->
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+ 
+    <!-- FullCalendar CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.css" />
+    <!-- Fonts -->
+<!--     <link href="https://fonts.googleapis.com/css2?family=Prompt&display=swap" rel="stylesheet"> -->
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  
+   <!-- LineSeed Fonts -->
+  <link href="https://cdn.jsdelivr.net/gh/maketline/goodday/font/stylesheet.min.css" rel="stylesheet">
+  
+    <style>
+         body {
+      font-family: "line_seed_sans_th", sans-serif;
+      font-weight: bold;
+      font-size: 12px;
+      background-color: #f8f9fa;
+    }
+        .fc-sat, .fc-sun {
+            color: red;
+        }
+        .color-box1 { background-color: yellow; }
+        .color-box2 { background-color: green; }
+        .color-box3 { background-color: blue; }
+        .modal {
+            z-index: 1050; /* ให้ modal อยู่บนสุด */
+        }
+      #container3 {
+          display: flex;
+        text-align: center;
+      }
+      .color-box1 {
+          background-color: yellow; /* สีพื้นหลังของกล่อง */
+          padding: 10px;
+          text-align: center;
+          height:10px;
+          border-radius: 20px;
+
+      }
+       .color-box2 {
+          background-color: green; /* สีพื้นหลังของกล่อง */
+          padding: 10px;
+          text-align: center;
+          height:10px;
+          border-radius: 20px;
+      }
+      .color-box3 {
+          background-color: blue; /* สีพื้นหลังของกล่อง */
+          padding: 10px;
+          text-align: center;
+          height:10px;
+          border-radius: 20px;
+      }
+  #modal {
+      z-index: 1000;
+   
+    }
+
+    .modal-header {
+      background-color: #3b82f6;
+      color: white;
+      padding: 1rem;
+      border-top-left-radius: 0.5rem;
+      border-top-right-radius: 0.5rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    #event-modal .relative,
+    #modal .relative {
+      padding: 0rem;
+      max-width: 90%;
+      margin: 0 auto;
+      box-sizing: border-box;
+    }
+
+    @media (min-width: 640px) {
+      #event-modal .relative,
+      #modal .relative {
+        max-width: 400px;
+      }
+    }
+
+    .modal-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem;
+      
+    }
+
+    .modal-footer {
+      flex-shrink: 0;
+      background-color: #3b82f6;
+      padding: 1rem;
+      border-bottom-left-radius: 0.5rem;
+      border-bottom-right-radius: 0.5rem;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: right;
+    }
+
+    .modal-footer button {
+      padding: 0.5rem 1rem;
+      border-radius: 0.25rem;
+      font-weight: 500;
+      transition: background-color 0.2s;
+    }
+
+    .modal-footer button:hover {
+      filter: brightness(90%);
+    }
+
+    #footer {
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+      
+     .footer {
+    font-size: 0.75rem; /* 12px */
+    color: #6b7280; /* text-gray-500 */
+    margin-top: 1.5rem; /* mt-6 */
+    text-align: center; /* text-center */
+} 
+
+    </style>
+</head>
+<body>
+
+   
+   <!-- Modal เพิ่มข้อมูล -->
+ <div id="modal" class="hidden">
+
+    <div class="relative top-5 mx-auto p-0 border w-96 shadow-lg rounded-md bg-white flex flex-col max-h-[80vh] ">
+      <!-- Header -->
+      <div class="bg-blue-500 text-white p-4 rounded-t-md modal-header">
+        <h3 class="text-lg leading-6 font-medium text-center">เพิ่มข้อมูล</h3>
+      </div>
+      <!-- Body -->
+      <div class="p-4 overflow-y-auto flex-1">
+   <form id="bookmyForm" method="POST" onsubmit="booksubmitForm(); return false;"  class="grid grid-cols-2 gap-4">
+    <!-- ชื่อผู้จอง -->
+<!--       <div class="form-group col-span-2 sm:col-span-1"> -->
+     
+         <!-- วันที่ออก และ วันที่เข้า -->
+    <div class="form-group">
+        <label class="block text-sm font-medium text-gray-700">วันที่ออก</label>
+        <input type="date" id="namestartDate" name="namestartDate" class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300 text-blue-600" required readonly>
+    </div>
+    <div class="form-group">
+        <label class="block text-sm font-medium text-gray-700">วันที่เข้า</label>
+        <input type="date" id="nameendDate" name="nameendDate" class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300 text-blue-600" required>
+    </div>
+     
+     
+    <div class="form-group">
+        <label class="block text-sm font-medium text-gray-700">ชื่อผู้จอง</label>
+        <input type="text" id="namebook" name="namebook" class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300 text-blue-600 pointer-events-none" list="list" required>
+        <datalist id="list">
+        <option value=''></option>
+                    <option value="นงคราญ เสมอเชื้อ">นงคราญ เสมอเชื้อ</option>
+                    <option value="ภาคภูมิ เรือนมูล">ภาคภูมิ เรือนมูล</option>
+                    <option value="สายสุนีย์ พุทธโส">สายสุนีย์ พุทธโส</option>
+                    <option value="คเชนทร์ ธรรมชัย">คเชนทร์ ธรรมชัย</option>
+                    <option value="ศรีพรรณ บุญเลา">ศรีพรรณ บุญเลา</option>
+                    <option value="กันทิมา สินธุผัด">กันทิมา สินธุผัด</option>
+                    <option value="กฤษฎิ์ณิชา วิภาษา">กฤษฎิ์ณิชา วิภาษา</option>
+                    <option value="พิชยา พรรณะพัฒน์">พิชยา พรรณะพัฒน์</option>
+                    <option value="ลิขิต ฉาดฉาน">ลิขิต ฉาดฉาน</option>
+                    <option value="อัมรินทร์ ศิรินานุวัฒน์">อัมรินทร์ ศิรินานุวัฒน์</option>
+                    <option value="ทนุจิต ผัดเจริญ">ทนุจิต ผัดเจริญ</option>
+                    <option value="ณัฏฐ์วรัตถ์ พรมเขียว">ณัฏฐ์วรัตถ์ พรมเขียว</option>
+                    <option value="อาภรณ์ นันทไชย">อาภรณ์ นันทไชย</option>
+                    <option value="ชัยวัฒก์ ตรียานุรักษ์">ชัยวัฒก์ ตรียานุรักษ์</option>
+                    <option value="กนกรัชต์ เมืองแก่น">กนกรัชต์ เมืองแก่น</option>
+                    <option value="ธรรมรัตณ์ เจริญสันติ">ธรรมรัตณ์ เจริญสันติ</option>
+                    <option value="ธีระพงศ์ พรหมวังค์">ธีระพงศ์ พรหมวังค์</option>
+                    <option value="ปวีณา เหมืองจา">ปวีณา เหมืองจา</option>
+                    <option value="พนัชกร สุขแยง">พนัชกร สุขแยง</option>
+                    <option value="ชนิกานต์  ใจคำ">ชนิกานต์ ใจคำ</option>
+                    <option value="วริศรา เก่งการค้า">วริศรา เก่งการค้า</option>
+                    <option value="วิทยา กำลังเก่ง">วิทยา กำลังเก่ง</option>
+                    <option value="อภิเดช กุลประยงค์">อภิเดช กุลประยงค์</option>
+                    <option value="วัชรกร ศรีวะอุไร">วัชรกร ศรีวะอุไร</option>
+                    <option value="วิเชียร แสนวังทอง">วิเชียร แสนวังทอง</option>
+                    <option value="สรศักดิ์ ต้องใจ">สรศักดิ์ ต้องใจ</option>
+                    <option value="ณัทจันโสม ชัยเมืองเลน">ณัทจันโสม ชัยเมืองเลน</option>
+                    <option value="จตุพร สิทธิพงศ์">จตุพร สิทธิพงศ์</option>
+                    <option value="พารีดา ชูวุฒยากร">พารีดา ชูวุฒยากร</option>
+                    <option value="สุกัญญา ศรีสุวรรณ">สุกัญญา ศรีสุวรรณ</option>
+                    <option value="สำราญ บุญหมื่น">สำราญ บุญหมื่น</option>
+                    <option value="จาฬุพร อินวงศ์">จาฬุพร อินวงศ์</option>
+                    <option value="มัธติกาล บุญโทย">มัธติกาล บุญโทย</option>
+                    <option value="สุชาติ กันคำ">สุชาติ กันคำ</option>
+                    <option value="ถวัลย์ ใจงาม">ถวัลย์ ใจงาม</option>
+                    <option value="อภิสรา สุทธจันทร์">อภิสรา สุทธจันทร์</option>
+                     <option value="ชาญวิทย์  สุวรรณรัตน์">ชาญวิทย์  สุวรรณรัตน์</option>
+                     <option value="นิคม จินะจันตา">นิคม จินะจันตา</option>
+                     <option value="กมลทิพย์ บุญหมื่น">กมลทิพย์ บุญหมื่น</option>
+                    <option value="ชนัฐปภา  ขว้างมา">ชนัฐปภา  ขว้างมา</option>
+                    <option value="พิบูลย์ บุญมี">พิบูลย์ บุญมี</option>
+                    <option value="ไกรวุฒิ ต๋าคำ">ไกรวุฒิ ต๋าคำ</option>
+                    <option value="สยาม  กิติกร">สยาม  กิติกร</option>
+                    <option value="ตรีธนา  ใจคำ">ตรีธนา  ใจคำ</option>
+                    <option value="อดุลย์ มาแปง">อดุลย์ มาแปง</option>
+        </datalist>
+    </div>
+
+    <!-- แผนก -->
+    <div class="form-group">
+        <label class="block text-sm font-medium text-gray-700">แผนก</label>
+        <select id="namedep" name="namedep" class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300 text-blue-600 pointer-events-none" required>
+                <option value=''></option>
+                    <option value="PC">PC</option>
+                    <option value="HR">HR</option>
+                    <option value="FN">FN</option>
+                    <option value="AC">AC</option>
+                    <option value="O&E">O&E</option>
+                    <option value="LAB">LAB</option>
+                    <option value="SF">SF</option>
+                    <option value="ST">ST</option>
+                    <option value="MC">MC</option>
+                    <option value="PR">PR</option>
+                    <option value="QC">QC</option>
+                    <option value="PA">PA</option>
+                    <option value="IT">IT</option>
+                    <option value="DC">DC</option>
+                    <option value="RM">RM</option>
+                    <option value="EC">EC</option>
+                    <option value="AP">AP</option>
+                    <option value="R&D">R&D</option>
+        </select>
+    </div>
+
+    <!-- เลือกรถ -->
+    <div class="form-group">
+        <label class="block text-sm font-medium text-gray-700">เลือกรถ</label>
+        <select id="namecar" name="namecar" class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300 text-blue-600" required>
+            <option value=""></option>
+<!--                     <option value="No.9">No.9</option> -->
+                    <option value="No.4">No.4</option>
+                    <option value="รถตู้" id="vancar">รถตู้</option>
+                    <option value="รถอื่นๆ">รถอื่นๆ</option>
+                    <option value="แคมรี่ดำ" id="camryblack">แคมรี่ดำ</option>
+                    <option value="แคมรี่ขาว" id="camrywhite">แคมรี่ขาว</option>
+                    <option value="ฟอร์จูนเนอร์" id="fortuner">ฟอร์จูนเนอร์</option>
+                    <option value="ฝากงาน">ฝากงาน</option>
+                    <option value="ติดรถไปติดต่องานด้วย">ติดรถไปติดต่องานด้วย</option>
+        </select>
+    </div>
+     
+      <!-- สถานะการขับ -->
+    <div class="form-group">
+        <label class="block text-sm font-medium text-gray-700">สถานะการขับ</label>
+        <select id="namedrivestatus" name="namedrivestatus" class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300 text-blue-600" required>
+            <option value=""></option>
+            <option value="ขับเอง">ขับเอง</option>
+            <option value="พร้อมคนขับ">พร้อมคนขับ</option>
+        </select>
+    </div>
+
+    <!-- สถานที่ๆไปติดต่อ -->
+    <div class="form-group col-span-2 sm:col-span-2">
+        <label class="block text-sm font-medium text-gray-700">สถานที่ๆไปติดต่อ</label>
+        <input type="text" id="nameloca" name="nameloca" class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300 text-blue-600" required>
+    </div>
+
+
+
+    <!-- เวลาออก และ เวลาเข้า -->
+    <div class="form-group">
+        <label class="block text-sm font-medium text-gray-700">เวลาออก</label>
+        <select id="namestartTime" name="namestartTime" class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300 text-blue-600" required>
+            <option value="">-- เลือกเวลาออก --</option>
+            <script>
+                for (var hour = 5; hour <= 23; hour++) {
+                    for (var minute = 0; minute <= 45; minute += 15) {
+                        var formattedHour = ('0' + hour).slice(-2);
+                        var formattedMinute = ('0' + minute).slice(-2);
+                        document.write('<option value="' + formattedHour + ':' + formattedMinute + '">' + formattedHour + ':' + formattedMinute + '</option>');
+                    }
+                }
+            </script>
+        </select>
+    </div>
+    <div class="form-group">
+        <label class="block text-sm font-medium text-gray-700">เวลาเข้า</label>
+        <select id="nameendTime" name="nameendTime" class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300 text-blue-600" required>
+            <option value="">-- เลือกเวลาเข้า --</option>
+            <script>
+                for (var hour = 8; hour <= 23; hour++) {
+                    for (var minute = 1; minute <= 46; minute += 15) {
+                        var formattedHour = ('0' + hour).slice(-2);
+                        var formattedMinute = ('0' + minute).slice(-2);
+                        document.write('<option value="' + formattedHour + ':' + formattedMinute + '">' + formattedHour + ':' + formattedMinute + '</option>');
+                    }
+                }
+            </script>
+        </select>
+    </div>
+
+   <input type="hidden" name="referer" id="referer">
+
+    <!-- อื่นๆ -->
+    <div class="form-group col-span-2 sm:col-span-2">
+        <label class="block text-sm font-medium text-gray-700">อื่นๆ</label>
+        <input type="text" id="nameother" name="nameother" class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300 text-blue-600">
+    </div>
+
+
+      </div>
+      <!-- Footer -->
+      <div class="bg-blue-500 p-4 rounded-b-md modal-footer">
+        <div class="flex justify-end gap-2">
+          <button type="submit"  onclick="booksubmitForm()" class="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600">บันทึก</button>
+          <button type="button" onclick="closeModal()" class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600">ปิด</button>
+        </div>
+      </div>
+      </form>
+    </div>
+   <br>
+  </div>
+
+  
+<section id="page1" style="display: none;" class="min-h-screen flex items-center justify-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow-lg">
+        <div>
+            <h2 class="text-center text-3xl font-extrabold text-gray-900">CarBook</h2>
+            <p class="mt-2 text-center text-sm text-gray-600">
+                กรุณาเข้าสู่ระบบเพื่อใช้งาน
+            </p>
+        </div>
+        <form id="loginForm" method="POST" onsubmit="loginForm(); return false;" class="mt-8 space-y-6">
+            <div class="rounded-md shadow-sm">
+                <div>
+                    <label for="username" class="sr-only">Username</label>
+                    <input 
+                        id="username" 
+                        name="username" 
+                        type="text" 
+                        required 
+                        class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm" 
+                        placeholder="Username"
+                    >
+                </div>
+                <br>
+                <div class="relative">
+                    <label for="password" class="sr-only">Password</label>
+                    <input 
+                        id="password" 
+                        name="password" 
+                        type="password" 
+                       
+                        maxlength="10" 
+                        required 
+                        class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm pr-10" 
+                        placeholder="Password"
+                    >
+                    <!-- ไอคอนแสดง/ซ่อนรหัสผ่าน -->
+                    <span id="togglePassword" class="absolute inset-y-0 right-3 flex items-center cursor-pointer">
+                        <i class="fas fa-eye text-gray-500"></i>
+                    </span>
+                </div>
+            </div>
+
+            <div>
+                <button 
+                    type="submit" 
+                    class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                    Login
+                </button>
+            </div>
+        </form>
+        <div class="text-center">
+            <p class="text-sm text-red-600">
+                ใช้ Username และ password เดิมของท่าน<br>เมื่อเข้าสู่ระบบแล้วสามารถกดตรงวันที่เพื่อจองรถได้เลย
+<!--                 <a href="##" data-bs-toggle="modal" data-bs-target="#myModal" class="font-medium text-blue-600 hover:text-blue-500">
+                    ลงทะเบียนที่นี่
+                </a> -->
+            </p>
+        </div>
+    </div>
+</section>
+  
+  
+   <section id="page2" style="display: none;">
+  <div id="calendarpage" class="container-fluid mt-4 px-4" style="display:none;">
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+        <!-- Header -->
+        <div class="bg-green-500 text-white py-3 px-6">
+            <h5 class="text-lg font-semibold">ปฏิทินจองรถ</h5>
+          ท่านสามารถกดตรงวันที่เพื่อจองรถได้เลย
+        </div>
+        <!-- Body -->
+        <div class="p-6">
+            <div id="calendar" class="bg-gray-100 p-4 rounded-lg shadow-md"></div><br>
+            <!-- Legend -->
+            <div id="container3" class="flex items-center space-x-4">
+                <div class="flex items-center">
+                    <div class="w-4 h-4 bg-yellow-500 rounded-sm"></div>
+                    <p class="ml-2 text-sm text-gray-600">= รออนุมัติ</p>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-4 h-4 bg-green-500 rounded-sm"></div>
+                    <p class="ml-2 text-sm text-gray-600">= อนุมัติ</p>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-4 h-4 bg-blue-500 rounded-sm"></div>
+                    <p class="ml-2 text-sm text-gray-600">= เสร็จงาน</p>
+                </div>
+            </div>
+        
+           
+        </div>
+   
+    
+     <div class="bg-green-500 text-white text-center py-3 px-6">
+            <h6 class="text-lg font-semibold" style="font-size: 15px;"> <i class="far fa-copyright"></i> พัฒนาโดย นาย ภาคภูมิ เรือนมูล Hr Support</h6>
+        
+        </div>
+    </div> 
+</div>
+
+</section>
+
+  <br>
+
+  
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/locale/th.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+    <script>
+       window.onload = function() {
+        document.getElementById('referer').value = window.location.hostname;
+    };
+      
+       var googleScriptUrl = 'https://script.google.com/macros/s/AKfycbxVVUfSwT1cSTb2oZWo0wXVHthaSIW7L0RD22sNMpHv6tSbqsEpn0hmODDmrf0siKVG/exec'; 
+      
+      
+         document.getElementById('togglePassword').addEventListener('click', function () {
+        const passwordField = document.getElementById('password');
+        const icon = this.querySelector('i');
+
+        if (passwordField.type === 'password') {
+            passwordField.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            passwordField.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    });
+      
+      
+      
+      // ตรวจสอบ localStorage เมื่อหน้าเว็บโหลด
+document.addEventListener('DOMContentLoaded', function () {
+    var storedStatuslogin = localStorage.getItem('statuslogin');
+    var storedFnamelogin = localStorage.getItem('fnamelogin');
+    var storedDeplogin = localStorage.getItem('deplogin');
+
+    if (storedStatuslogin === 'admin' && storedFnamelogin && storedDeplogin || storedStatuslogin === 'user2' && storedFnamelogin && storedDeplogin ) {
+        // ถ้ามีข้อมูลการล็อกอินใน localStorage
+        document.getElementById('page1').style.display = 'none'; // ซ่อน page1
+        document.getElementById('page2').style.display = 'block'; // แสดง page2
+        $('#namebook').val(storedFnamelogin);
+        $('#namedep').val(storedDeplogin);
+        // $("#namebook").addClass("pointer-events-none bg-gray-100 text-gray-500 cursor-not-allowed");
+        // $("#namedep").addClass("pointer-events-none bg-gray-100 text-gray-500 cursor-not-allowed");
+      $("#namebook").removeClass("pointer-events-none");
+      $("#namedep").removeClass("pointer-events-none");
+    } else if (storedStatuslogin === 'user' && storedFnamelogin && storedDeplogin) {
+        // ถ้ามีข้อมูลการล็อกอินใน localStorage
+        document.getElementById('page1').style.display = 'none'; // ซ่อน page1
+        document.getElementById('page2').style.display = 'block'; // แสดง page2
+        $('#namebook').val(storedFnamelogin);
+        $('#namedep').val(storedDeplogin);
+       $('#vancar').hide();
+       $('#camryblack').hide();
+       $('#camrywhite').hide();
+       $('#fortuner').hide();
+        // $("#namebook").addClass("pointer-events-none bg-gray-100 text-gray-500 cursor-not-allowed");
+        // $("#namedep").addClass("pointer-events-none bg-gray-100 text-gray-500 cursor-not-allowed");
+      $("#namebook").addClass("pointer-events-none");
+      $("#namedep").addClass("pointer-events-none");
+    } else {
+        // ถ้าไม่มีข้อมูลการล็อกอินใน localStorage
+        document.getElementById('page1').style.display = 'flex'; // แสดง page1
+        document.getElementById('page2').style.display = 'none'; // ซ่อน page2
+    }
+});
+
+// ฟังก์ชัน loginForm
+function loginForm() {
+    event.preventDefault();
+    Swal.fire({
+        position: 'center',
+        title: '<h4>กำลังตรวจสอบข้อมูล...</h4>',
+        showConfirmButton: false,
+    });
+    Swal.showLoading();
+
+    var checkusername = document.getElementById('username').value;
+    var checkpassword = document.getElementById('password').value;
+
+    if (checkusername == "") {
+        Swal.fire({
+            position: 'center',
+            icon: 'error',
+            title: '<h4>กรุณากรอกUsernameของท่าน</h4>',
+            showConfirmButton: true,
+            confirmButtonText: 'OK',
+        });
+        return;
+    } else if (checkpassword == "") {
+        Swal.fire({
+            position: 'center',
+            icon: 'error',
+            title: '<h4>กรุณากรอกPasswordของท่าน</h4>',
+            showConfirmButton: true,
+            confirmButtonText: 'OK',
+        });
+        return;
+    }
+
+    var formData = new FormData(document.getElementById("loginForm"));
+    formData.append('action', 'loginhtml'); // เพิ่ม key "action" เพื่อบ่งบอกว่าเป็นการ loginhtml
+
+    fetch(googleScriptUrl, {
+        method: 'POST',
+        body: formData
+    })
+        .then(response => response.json()) // แปลง response เป็น JSON
+        .then(data => {
+            if (data !== false) {
+                var usernamelogin = data.usernamelogin;
+                var passwordlogin = data.passwordlogin;
+                var fnamelogin = data.namelogin;
+                var deplogin = data.deplogin;
+                var statuslogin = data.statuslogin;
+                if (statuslogin === 'admin' || statuslogin === 'user2') {
+                    localStorage.setItem('statuslogin', statuslogin);
+                    localStorage.setItem('fnamelogin', fnamelogin);
+                    localStorage.setItem('deplogin', deplogin);
+                    Swal.fire({
+                        position: 'center',
+                        icon: 'success',
+                        title: '<h4>ยินดีต้อนรับ<br>คุณ ' + fnamelogin + '</h4>',
+                        showConfirmButton: false,
+                        timer: 1500,
+                    });
+                    document.getElementById('page1').style.display = 'none'; // ซ่อน page1
+                    document.getElementById('page2').style.display = 'block'; // แสดง page2
+                    $('#namebook').val(fnamelogin);
+                    $('#namedep').val(deplogin);
+                    // $("#namebook").addClass("pointer-events-none bg-gray-100 text-gray-500 cursor-not-allowed");
+                    // $("#namedep").addClass("pointer-events-none bg-gray-100 text-gray-500 cursor-not-allowed");
+                    $("#namebook").removeClass("pointer-events-none");
+                    $("#namedep").removeClass("pointer-events-none");
+                } else if (statuslogin === 'user') {
+                    localStorage.setItem('statuslogin', statuslogin);
+                    localStorage.setItem('fnamelogin', fnamelogin);
+                    localStorage.setItem('deplogin', deplogin);
+                    Swal.fire({
+                        position: 'center',
+                        icon: 'success',
+                        title: '<h4>ยินดีต้อนรับ<br>คุณ ' + fnamelogin + '</h4>',
+                        showConfirmButton: false,
+                        timer: 1500,
+                    });
+                    document.getElementById('page1').style.display = 'none'; // ซ่อน page1
+                    document.getElementById('page2').style.display = 'block'; // แสดง page2
+                    $('#namebook').val(fnamelogin);
+                    $('#namedep').val(deplogin);
+                    // $("#namebook").addClass("pointer-events-none bg-gray-100 text-gray-500 cursor-not-allowed");
+                    // $("#namedep").addClass("pointer-events-none bg-gray-100 text-gray-500 cursor-not-allowed");
+                    $('#vancar').hide();
+                    $('#camryblack').hide();
+                    $('#camrywhite').hide();
+                    $('#fortuner').hide();
+                    $("#namebook").addClass("pointer-events-none");
+                    $("#namedep").addClass("pointer-events-none");
+                }
+            } else {
+                Swal.fire({
+                    position: 'center',
+                    icon: 'error',
+                    title: '<h4>ไม่พบข้อมูลที่ท่านกรอกในระบบ</h4>',
+                    showConfirmButton: true,
+                    confirmButtonText: 'กดปิด',
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire({
+                position: 'center',
+                icon: 'error',
+                title: '<h4>มีข้อผิดพลาดเกิดขึ้น</h4>',
+                showConfirmButton: true,
+                confirmButtonText: 'กดปิด',
+            });
+        });
+}
+
+// ฟังก์ชัน logout
+function logout() {
+    Swal.fire({
+        title: 'คุณต้องการออกจากระบบหรือไม่?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'ต้องการ!',
+        cancelButtonText: 'ยกเลิก'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            localStorage.clear(); // ล้างข้อมูลใน localStorage
+            document.getElementById('loginForm').reset(); // รีเซ็ตฟอร์ม
+            document.getElementById('page1').style.display = 'flex'; // แสดง page1
+            document.getElementById('page2').style.display = 'none'; // ซ่อน page2
+          location.reload();
+        }
+    });
+}
+      
+      
+
+      
+      
+   var googleScriptUrlCalendar = 'https://script.google.com/macros/s/AKfycbyxIh7eFd4n3ENXiIV0N3EM3prNfOakTInlhehMrmQdL9K1zzoaa5Y5UYnCli66HHou/exec'; 
+     
+function updateCalendar() {
+  const storedStatuslogin = localStorage.getItem('statuslogin');
+  const storedFnamelogin = localStorage.getItem('fnamelogin');
+  const storedDeplogin = localStorage.getItem('deplogin');
+
+  // เช็คว่ามีข้อมูล login หรือไม่
+  if (storedStatuslogin && storedFnamelogin && storedDeplogin) {
+    lodingpagetoday(); // แสดงหน้าโหลดถ้ามีข้อมูล login
+  }
+
+  const cachedData = getCachedData();
+  if (cachedData) {
+    renderData(cachedData); // แสดงข้อมูล Cache ทันที
+  }
+
+  $.ajax({
+    url: googleScriptUrlCalendar + '?t=' + Date.now(), // ป้องกัน cache browser
+    dataType: 'json',
+    success: function(data) {
+      setCachedData(data); // อัปเดต Cache
+      if (!deepCompare(data, cachedData)) { // ตรวจสอบการเปลี่ยนแปลงข้อมูล
+        renderData(data); // อัปเดตเมื่อข้อมูลเปลี่ยน
+      }
+      Swal.close();
+      $("#calendarpage").show();
+    },
+    error: function() {
+      Swal.close();
+      alert('เกิดข้อผิดพลาดในการโหลดข้อมูล');
+    }
+  });
+}
+
+
+
+// ฟังก์ชันจัดการ Cache
+function getCachedData() {
+  const cache = localStorage.getItem('calendarCache');
+  if (!cache) return null;
+  
+  const { data } = JSON.parse(cache);
+  
+  return data; // คืนข้อมูลจาก Cache โดยไม่สนใจอายุ
+}
+
+function setCachedData(data) {
+  const cache = {
+    data: data,
+    timestamp: Date.now() // เก็บเวลาปัจจุบันเพื่อใช้อ้างอิงในอนาคต
+  };
+  localStorage.setItem('calendarCache', JSON.stringify(cache));
+}
+
+
+// ฟังก์ชันตรวจสอบการเปลี่ยนแปลงข้อมูล
+function deepCompare(a, b) {
+  return JSON.stringify(a) === JSON.stringify(b);
+}
+
+        // ฟังก์ชันแสดงปฏิทิน
+    function renderData(data) {
+    // const thaiHolidays = [
+    //     { title: "วันปีใหม่", date: "2025-01-01" },
+    //     { title: "วันมาฆบูชา", date: "2025-02-12" },
+    //     { title: "วันจักรี", date: "2025-04-06" },
+    //     { title: "วันสงกรานต์", date: "2025-04-13" },
+    //     { title: "วันสงกรานต์", date: "2025-04-14" },
+    //     { title: "วันสงกรานต์", date: "2025-04-15" },
+    //     { title: "วันสงกรานต์", date: "2025-04-16" },
+    //     { title: "วันแรงงาน", date: "2025-05-01" },
+    //     { title: "วันฉัตรมงคล", date: "2025-05-04" },
+    //     { title: "หยุดชดเชยวันฉัตรมงคล", date: "2025-05-05" },
+    //     { title: "วันพืชมงคล", date: "2025-05-09" },
+    //     { title: "วันวิสาขบูชา", date: "2025-05-11" },
+    //     { title: "หยุดชดเชยวันวิสาขบูชา", date: "2025-05-12" },
+    //     { title: "วันเฉลิมราชินีรัชกาลที่10", date: "2025-06-03" },
+    //     { title: "วันอาสาฬหบูชา", date: "2025-07-10" },
+    //     { title: "วันเข้าพรรษา", date: "2025-07-11" },
+    //     { title: "วันพระบรมราชสมภพรัชกาลที่10", date: "2025-07-28" },
+    //     { title: "วันแม่แห่งชาติ", date: "2025-08-12" },
+    //     { title: "วันคล้ายวันสวรรคตรัชกาลที่9", date: "2025-10-13" },
+    //     { title: "วันปิยมหาราช", date: "2025-10-23" },
+    //     { title: "วันพ่อแห่งชาติ", date: "2025-12-05" },
+    //     { title: "วันรัฐธรรมนูญ", date: "2025-12-10" },
+    //     { title: "วันคริสต์มาส", date: "2025-12-25" },
+    //     { title: "วันสิ้นปี", date: "2025-12-31" }
+    // ];
+      
+        const cmthaiHolidays = [
+        { title: "วันปีใหม่", date: "2025-01-01" },
+        { title: "วันมาฆบูชา", date: "2025-02-12" },
+        { title: "วันสงกรานต์", date: "2025-04-12" },
+        { title: "วันสงกรานต์", date: "2025-04-13" },
+        { title: "วันสงกรานต์", date: "2025-04-14" },
+        { title: "วันสงกรานต์", date: "2025-04-15" },
+        { title: "วันสงกรานต์", date: "2025-04-16" },
+        { title: "หยุดชดเชยวันสงกรานต์", date: "2025-04-17" },
+        { title: "วันแรงงาน", date: "2025-05-01" },
+        { title: "วันเฉลิมราชินีรัชกาลที่10", date: "2025-06-03" },
+        { title: "วันอาสาฬหบูชา", date: "2025-07-10" },
+        { title: "วันพระบรมราชสมภพรัชกาลที่10", date: "2025-07-28" },
+        { title: "วันแม่แห่งชาติ", date: "2025-08-12" },
+        { title: "วันพ่อแห่งชาติ", date: "2025-12-05" },
+        { title: "วันสิ้นปี", date: "2025-12-31" }
+    ];
+
+    //  const holidays = thaiHolidays.map(holiday => ({
+    //     title: holiday.title,
+    //     start: holiday.date,
+    //     allDay: true,
+    //     backgroundColor: "#d81b60",
+    //     borderColor: "#e11d48",
+    //     textColor: "#ffffff",
+    //     isHoliday: true
+    // }));
+      
+   const cmHolidays = cmthaiHolidays.map(holiday => ({
+    title: holiday.title,
+    start: holiday.date,
+    allDay: true,
+    backgroundColor: "#e51c23",
+    borderColor: "#e11d48",
+    textColor: "#ffffff",
+    isHolidaycm: true
+}));
+      
+  
+
+    const wanPhraDays = [
+      "2025-01-06", "2025-01-13", "2025-01-21", "2025-01-28",
+      "2025-02-05", "2025-02-12", "2025-02-20", "2025-02-26",
+      "2025-03-06", "2025-03-13", "2025-03-21", "2025-03-28",
+      "2025-04-05", "2025-04-12", "2025-04-20", "2025-04-26",
+      "2025-05-04", "2025-05-11", "2025-05-19", "2025-05-26",
+      "2025-06-03", "2025-06-10", "2025-06-18", "2025-06-25",
+      "2025-07-03", "2025-07-10", "2025-07-18", "2025-07-25",
+      "2025-08-02", "2025-08-09", "2025-08-17", "2025-08-23",
+      "2025-09-07", "2025-09-15", "2025-09-22", "2025-09-30",
+      "2025-10-07", "2025-10-15", "2025-10-21", "2025-10-19",
+      "2025-11-05", "2025-11-13", "2025-11-20", "2025-11-28",
+      "2025-12-05", "2025-12-13", "2025-12-19", "2025-12-27"
+    ];
+
+   const wanPhraEvents = wanPhraDays.map(date => ({
+        title: "\uD83C\uDF15",
+        start: date,
+        allDay: true,
+        backgroundColor: "#311b92",
+        borderColor: "#6366f1",
+        textColor: "#ffffff",
+        isHoliday3: true
+    }));
+
+    $('#calendar').fullCalendar('destroy');
+    $('#calendar').fullCalendar({
+        header: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'month'
+        },
+        height: 'auto',
+        editable: false,
+        timezone: 'local',
+        locale: 'th',
+        nextDayThreshold: '00:00:00',
+        dayNamesShort: ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'],
+        showNonCurrentDates: false,
+        events: [...data.map(event => ({
+            id: event.id,
+            title: event.title,
+            start: moment(event.startday, 'YYYY-MM-DD'),
+            end: moment(event.endday, 'YYYY-MM-DD').add(1, 'days'),
+            allDay: true,
+            status: event.status,
+            starttime: event.starttime,
+            endtime: event.endtime,
+            namebook: event.namebook,
+            loca: event.loca,
+            dep: event.dep,
+            other: event.other,
+            driver: event.driver,
+            approve: event.approve,
+            isHoliday: false
+        })), ...cmHolidays, ...wanPhraEvents],
+        eventRender: function(event, element) {
+            element.find('.fc-time').hide();
+             if (event.isHolidaycm) {
+                element.find('.fc-title').html(`<div style="text-align:center;">${event.title}<br>Cmหยุด</div>`);
+            }else if (event.isHoliday3) {
+                element.find('.fc-title').html(`<div style="text-align:center;">${event.title}<br>วันพระ</div>`);
+            } else {
+                element.find('.fc-title').html(`<div style="text-align:center;">${event.title}<br>${event.starttime} - ${event.endtime}</div>`);
+            }
+          
+                      if (event.status === 'รออนุมัติ') {
+                element.css({ 'background-color': '#facc15', 'border-radius': '5px', 'padding': '1px' });
+                element.find('.fc-title').css('color', '#1f2937');
+            } else if (event.status === 'อนุมัติ') {
+                element.css({ 'background-color': '#16a34a', 'border-radius': '5px', 'padding': '1px' });
+                element.find('.fc-title').css('color', '#ffffff');
+            } else if (event.status === 'ส่งคืน') {
+                element.css({ 'background-color': '#3b82f6', 'border-radius': '5px', 'padding': '1px' });
+                element.find('.fc-title').css('color', '#ffffff');
+            } else if (event.status === 'กำลังใช้งาน') {
+    element.css({ 'background-color': '#ef4444', 'border-radius': '5px', 'padding': '1px' });
+    element.find('.fc-title').css({ 'color': '#ffffff', 'display': 'flex', 'align-items': 'center' });
+
+    // เพิ่มไอคอนรูปล้อรถหมุน (ใช้ FontAwesome)
+   
+   element.find('.fc-title').html(`
+  <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; width: 100%;">
+    <i class="fas fa-car-side fa-shake"></i> 
+    <span>${event.status} ${event.title}</span>
+    <span>${event.starttime} - ${event.endtime}</span>
+  </div>
+`);
+
+}
+     
+        },
+        eventClick: function(event) {
+            showDateOptions(event.start.format('YYYY-MM-DD'));
+        },
+        dayClick: function(date) {
+            showDateOptions(date.format('YYYY-MM-DD'));
+        }
+    });
+    cachedEventsData = data;
+}
+
+
+         function lodingpagetodayswal() {
+      Swal.fire({
+        position: 'center',
+        title: '<h6 style="font-size:20px;">กำลังอัปเดตข้อมูลการจอง...</h6>',
+        text: 'กรุณารอสักครู่',
+        icon: 'info',
+        showConfirmButton: false,
+        allowOutsideClick: false,
+        willOpen: () => {
+        Swal.showLoading();
+        }
+          });
+          Swal.showLoading();
+        }
+
+            
+    
+          function lodingpagetoday() {
+      Swal.fire({
+        position: 'center',
+        title: '<h6 style="font-size:20px;">กำลังอัปเดตข้อมูลการจอง...</h6>',
+        text: 'กรุณารอสักครู่',
+        icon: 'info',
+        showConfirmButton: false,
+        allowOutsideClick: false,
+        willOpen: () => {
+        Swal.showLoading();
+        }
+          });
+          Swal.showLoading();
+        }
+      
+      
+      $(document).ready(function() {
+  const cachedData = getCachedData();
+  cachedEventsData = cachedData || [];
+  
+  if (cachedData) {
+    renderData(cachedData);
+  } else {
+    lodingpagetoday();
+  }
+  
+  updateCalendar(); // โหลดข้อมูลใหม่ทุกครั้งที่เปิดหน้า
+});
+      
+
+
+        // อัปเดตปฏิทินเมื่อรีเฟรชหน้าจอ
+        $(window).on('load', function() {
+            updateCalendar();
+        });
+      
+ // เก็บข้อมูลที่โหลดมาแล้ว เพื่อลดการโหลดซ้ำ
+let cachedEventsData = [];
+
+// โหลดข้อมูลรายการจองทั้งหมดเมื่อเริ่มต้น
+function fetchAllEvents() {
+ // lodingpagetoday();
+    $.ajax({
+        url: googleScriptUrlCalendar,
+        dataType: 'json',
+        success: function(data) {
+            cachedEventsData = data; // เก็บข้อมูลไว้
+         // Swal.close();
+        },
+        error: function() {
+            console.error('❌ โหลดข้อมูลไม่สำเร็จ');
+        }
+    });
+}
+
+// ฟังก์ชันแสดงตัวเลือกเมื่อคลิกวันที่
+function showDateOptions(selectedDate) {
+    const selectedUTCDate = new Date(selectedDate + 'T00:00:00Z').toISOString().split('T')[0];
+    const formattedDate = moment(selectedUTCDate).format('DD-MM-YYYY');
+
+    Swal.fire({
+        title: `วันที่ ${formattedDate}`,
+        text: 'คุณต้องการทำอะไร?',
+        showConfirmButton: false,
+        showCancelButton: false,
+        showDenyButton: false,
+        allowOutsideClick: false,
+        footer: `
+          <div style="display: flex; gap: 10px; justify-content: flex-end;">
+          <button onclick="logout()" class="swal2-deny swal2-styled">Log out</button>
+            <button id="btn-view" class="swal2-confirm swal2-styled" style="background-color: blue;">ดูรายการจอง</button>
+            <button id="btn-book" class="swal2-confirm swal2-styled">จองรถ</button>
+            <button id="btn-closs" class="swal2-confirm swal2-styled" style="background-color: gray;">ปิด</button>
+          </div>
+        `
+    });
+
+    setTimeout(() => {
+        document.getElementById("btn-closs").addEventListener("click", () => Swal.close());
+        document.getElementById("btn-book").addEventListener("click", () => {
+            Swal.close();
+            openAddDataModal(selectedUTCDate);
+            $("#calendarpage").hide();
+        });
+        document.getElementById("btn-view").addEventListener("click", () => {
+            showAllEventsForDate(selectedUTCDate);
+        });
+    }, 100);
+}
+
+// ฟังก์ชันแสดงรายละเอียดรายการจอง
+function showAllEventsForDate(selectedDate) {
+    const selectedUTCDate = new Date(selectedDate + 'T00:00:00Z').toISOString().split('T')[0];
+
+    // ค้นหาข้อมูลใน cache และกรองเฉพาะวันที่ที่ต้องการ
+    let eventsForDate = cachedEventsData.filter(event => {
+        const eventStartDate = moment(event.startday, 'YYYY-MM-DD').format('YYYY-MM-DD');
+        const eventEndDate = moment(event.endday, 'YYYY-MM-DD').format('YYYY-MM-DD');
+        return selectedUTCDate >= eventStartDate && selectedUTCDate <= eventEndDate;
+    });
+
+    // ถ้าไม่มีรายการจอง
+    if (eventsForDate.length === 0) {
+        Swal.fire({
+            icon: 'info',
+            title: 'ไม่มีรายการจองรถในวันนี้',
+            confirmButtonText: 'ปิด'
+        });
+        return;
+    }
+
+    // เรียงลำดับตาม starttime
+    eventsForDate.sort((a, b) => a.starttime.localeCompare(b.starttime));
+
+    // แปลงวันที่เป็นรูปแบบไทย
+    const date = new Date(selectedDate);
+    const formattedDate = date.toLocaleDateString('th-TH', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+    }).replace(/\//g, '-');
+
+    // นับจำนวนคิวการจอง
+    const totalBookings = eventsForDate.length;
+
+    // สร้าง HTML แสดงข้อมูล
+    let eventDetails = eventsForDate.map((event, index) => `
+        <table class='w-full border border-gray-300 shadow-md rounded-lg text-left'>
+            <thead class='bg-blue-500 text-white'>
+                <tr><th colspan='2' class='text-center p-3 text-lg font-semibold'>คิวที่ ${index + 1}</th></tr>
+            </thead>
+            <tbody class='bg-white'>
+                <tr class='border-b'><th class='p-2 bg-gray-100 text-left'>ชื่อ</th><td class='p-2 text-blue-600'>${event.namebook}</td></tr>
+                <tr class='border-b'><th class='p-2 bg-gray-100 text-left'>รถ</th><td class='p-2 text-blue-600'>${event.title}</td></tr>
+                <tr class='border-b'><th class='p-2 bg-gray-100 text-left'>ปลายทาง</th><td class='p-2 text-blue-600'>${event.loca}</td></tr>
+                <tr class='border-b'><th class='p-2 bg-gray-100 text-left'>เวลา</th><td class='p-2 text-blue-600'>${event.starttime} - ${event.endtime} น.</td></tr>
+                <tr class='border-b'><th class='p-2 bg-gray-100 text-left'>คนขับ</th><td class='p-2 text-blue-600'>${event.driver}</td></tr>
+                <tr class='border-b'><th class='p-2 bg-gray-100 text-left'>อื่นๆ</th><td class='p-2 text-blue-600'>${event.other || '-'}</td></tr>
+                <tr class='border-b'>
+    <th class='p-2 bg-gray-100 text-left'>สถานะ</th>
+    <td class='p-2 ${
+        event.status === "กำลังใช้งาน" ? "text-red-600 font-bold" : 
+        event.status === "ส่งคืน" ? "text-green-600 font-bold" : 
+        "text-blue-600"
+    }'>
+        ${event.status}
+    </td>
+</tr>
+
+                <tr><th class='p-2 bg-gray-100 text-left'>ผู้อนุมัติ</th><td class='p-2 text-blue-600'>${event.approve}</td></tr>
+            </tbody>
+        </table>
+        <br>
+    `).join('');
+
+    // แสดงข้อมูลผ่าน Swal
+    Swal.fire({
+        title: `<h5 style="font-size: 18px;">วันที่ ${formattedDate} มีการจอง ${totalBookings} คิว</h5>`,
+        html: eventDetails,
+        confirmButtonText: 'ปิด',
+        showCloseButton: true,
+        customClass: {
+            popup: 'swal-wide'
+        }
+    });
+}
+
+
+// โหลดข้อมูลตั้งแต่เปิดเว็บ
+fetchAllEvents();
+
+      
+      
+      
+         
+
+      
+          // ฟังก์ชันเปิด Modal เพิ่มข้อมูล
+function openAddDataModal(selectedDate = '') {
+ const modal = document.getElementById('modal');
+  const startDateInput = document.getElementById('namestartDate');
+  const endDateInput = document.getElementById('nameendDate');
+  startDateInput.value = selectedDate; // ตั้งค่าวันที่ในรูปแบบ UTC
+  endDateInput.value = selectedDate; // ตั้งค่าวันที่ในรูปแบบ UTC
+  modal.classList.remove('hidden'); // แสดง Modal
+}
+
+
+
+
+function closeModal() {
+    document.getElementById("modal").classList.add("hidden");
+  $("#calendarpage").hide();
+  updateCalendar()
+  //updateCalendar();
+}
+
+          // ฟังก์ชันปิด Modal แก้ไขข้อมูล
+    function closeEventModal() {
+      const modal = document.getElementById('modal');
+      modal.classList.add('hidden');
+    }
+
+      
+      
+      
+    
+      
+      
+        function getCurrentDate() {
+        var today = new Date();
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0');
+        var yyyy = today.getFullYear();
+        return yyyy + '-' + mm + '-' + dd;
+    }
+
+    // กำหนดค่าเริ่มต้นให้ input[type="date"]
+    var todayDate = getCurrentDate();
+    document.getElementById('namestartDate').value = todayDate;
+    document.getElementById('namestartDate').min = todayDate;
+
+    document.getElementById('nameendDate').value = todayDate;
+    document.getElementById('nameendDate').min = todayDate;
+
+
+   function booksubmitForm() {
+  event.preventDefault();
+  Swal.fire({
+    position: 'center',
+    title: '<h4>กำลังบันทึกข้อมูล...</h4>',
+    showConfirmButton: false,
+  });
+  Swal.showLoading();
+
+  // ดึงค่าจากฟอร์ม
+  var namebook = document.getElementById('namebook').value;
+  var namedep = document.getElementById('namedep').value;
+  var namecar = document.getElementById('namecar').value;
+  var nameloca = document.getElementById('nameloca').value;
+  var namestartDate = document.getElementById('namestartDate').value;
+  var nameendDate = document.getElementById('nameendDate').value;
+  var namestartTime = document.getElementById('namestartTime').value;
+  var nameendTime = document.getElementById('nameendTime').value;
+  var namedrivestatus = document.getElementById('namedrivestatus').value;
+  var nameother = document.getElementById('nameother').value;
+     var referer = document.querySelector('input[name="referer"]').value;
+
+  // ตรวจสอบข้อมูลที่จำเป็น
+  if (namebook == "") {
+    Swal.fire({
+      position: 'center',
+      icon: 'error',
+      title: '<h4>กรุณากรอกชื่อสกุลท่าน</h4>',
+      showConfirmButton: true,
+      confirmButtonText: 'OK',
+    });
+    return;
+  } else if (namedep == "") {
+    Swal.fire({
+      position: 'center',
+      icon: 'error',
+      title: '<h4>กรุณาเลือกแผนกของท่าน</h4>',
+      showConfirmButton: true,
+      confirmButtonText: 'OK',
+    });
+    return;
+  } else if (namecar == "") {
+    Swal.fire({
+      position: 'center',
+      icon: 'error',
+      title: '<h4>กรุณาเลือกรถที่ท่านต้องการจอง</h4>',
+      showConfirmButton: true,
+      confirmButtonText: 'OK',
+    });
+    return;
+  } else if (nameloca == "") {
+    Swal.fire({
+      position: 'center',
+      icon: 'error',
+      title: '<h4>กรุณาเลือกสถานที่ๆท่านไปติดต่อ</h4>',
+      showConfirmButton: true,
+      confirmButtonText: 'OK',
+    });
+    return;
+  } else if (namestartDate == "") {
+    Swal.fire({
+      position: 'center',
+      icon: 'error',
+      title: '<h4>กรุณาเลือกวันที่ๆต้องการจอง</h4>',
+      showConfirmButton: true,
+      confirmButtonText: 'OK',
+    });
+    return;
+  } else if (nameendDate == "") {
+    Swal.fire({
+      position: 'center',
+      icon: 'error',
+      title: '<h4>กรุณาเลือกวันที่เข้า</h4>',
+      showConfirmButton: true,
+      confirmButtonText: 'OK',
+    });
+    return;
+  } else if (namestartTime == "") {
+    Swal.fire({
+      position: 'center',
+      icon: 'error',
+      title: '<h4>กรุณาเลือกเวลาออก</h4>',
+      showConfirmButton: true,
+      confirmButtonText: 'OK',
+    });
+    return;
+  } else if (nameendTime == "") {
+    Swal.fire({
+      position: 'center',
+      icon: 'error',
+      title: '<h4>กรุณาเลือกเวลาเข้า</h4>',
+      showConfirmButton: true,
+      confirmButtonText: 'OK',
+    });
+    return;
+  } else if (namestartDate > nameendDate) {
+    Swal.fire({
+      position: 'center',
+      icon: 'error',
+      title: '<h4>วันที่ออกต้องไม่เกินวันที่เข้า</h4>',
+      showConfirmButton: true,
+      confirmButtonText: 'OK',
+    });
+    return;
+  } else if (namestartTime >= nameendTime) {
+    Swal.fire({
+      position: 'center',
+      icon: 'error',
+      title: '<h4>รูปแบบวันที่ไม่ถูกต้อง</h4>',
+      showConfirmButton: true,
+      confirmButtonText: 'OK',
+    });
+    return;
+  } else if (namedrivestatus == "") {
+    Swal.fire({
+      position: 'center',
+      icon: 'error',
+      title: '<h4>กรุณาเลือกต้องการขับเองหรือพร้อมคนขับ</h4>',
+      showConfirmButton: true,
+      confirmButtonText: 'OK',
+    });
+    return;
+  }
+
+  // ตรวจสอบข้อมูลซ้ำ
+const isDuplicate = cachedEventsData.some(event => {
+  // ข้ามการตรวจสอบถ้าชื่อรายการเป็น "ฝากงาน" หรือ "ติดรถไปติดต่องานด้วย"
+  if (event.title === "ฝากงาน" || event.title === "ติดรถไปติดต่องานด้วย") {
+    return false;
+  }
+
+  const eventStartDateTime = moment(`${event.startday} ${event.starttime}`, 'YYYY-MM-DD HH:mm');
+  const eventEndDateTime = moment(`${event.endday} ${event.endtime}`, 'YYYY-MM-DD HH:mm');
+  const newStartDateTime = moment(`${namestartDate} ${namestartTime}`, 'YYYY-MM-DD HH:mm');
+  const newEndDateTime = moment(`${nameendDate} ${nameendTime}`, 'YYYY-MM-DD HH:mm');
+
+  return (
+    event.title === namecar && // ตรวจสอบว่ารถที่จองตรงกัน
+    newStartDateTime.isBefore(eventEndDateTime) && // เวลาที่ต้องการจองเริ่มก่อนที่อีกเหตุการณ์จะจบ
+    newEndDateTime.isAfter(eventStartDateTime) // เวลาที่ต้องการจองจบหลังจากอีกเหตุการณ์เริ่ม
+  );
+});
+
+
+
+  if (isDuplicate) {
+    Swal.fire({
+      position: 'center',
+      icon: 'error',
+      title: '<h4>มีการจองวันที่และช่วงเวลานี้แล้ว</h4>',
+      showConfirmButton: true,
+      confirmButtonText: 'OK',
+    });
+    return;
+  }
+
+  // หากไม่มีข้อมูลซ้ำ ส่งข้อมูลไปยัง Google Script
+  var formData = new FormData(document.getElementById("bookmyForm"));
+formData.append('action', 'submitForm');
+formData.append('referer', referer);
+
+fetch(googleScriptUrl, {
+  method: 'POST',
+  body: formData
+})
+  .then(response => response.json())
+  .then(data => {
+    if (data === true) {
+      // เคลียร์ฟอร์มหลังจากบันทึกข้อมูล
+      document.getElementById('namecar').value = "";
+      document.getElementById('nameloca').value = "";
+      document.getElementById('namestartDate').value = "";
+      document.getElementById('nameendDate').value = "";
+      document.getElementById('namestartTime').value = "";
+      document.getElementById('nameendTime').value = "";
+      document.getElementById('namedrivestatus').value = "";
+      document.getElementById('nameother').value = "";
+
+      Swal.fire({
+        position: 'center',
+        icon: 'success',
+        title: '<h4>บันทึกข้อมูลสำเร็จ</h4>',
+        showConfirmButton: false,
+        timer: 1500,
+      }).then(() => {
+        updateCalendar();
+        closeModal();
+        // location.reload();
+      });
+    } else if (data === "Unauthorized Request: Invalid Referer") {
+      // แสดง alert หาก referer ไม่ถูกต้อง
+      Swal.fire({
+        position: 'center',
+        icon: 'error',
+        title: '<h4>การร้องขอถูกปฏิเสธ เนื่องจาก Referer ไม่ถูกต้อง</h4>',
+        showConfirmButton: true,
+        confirmButtonText: 'OK',
+      });
+    } else {
+      Swal.fire({
+        position: 'center',
+        icon: 'error',
+        title: '<h4>มีการจองวันที่และช่วงเวลานี้แล้ว</h4>',
+        showConfirmButton: true,
+        confirmButtonText: 'OK',
+      });
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    Swal.fire({
+      position: 'center',
+      icon: 'error',
+      title: '<h4>เกิดข้อผิดพลาดในการเชื่อมต่อ</h4>',
+      showConfirmButton: true,
+      confirmButtonText: 'OK',
+    });
+  });
+
+}
+      
+      
+      
+    </script>
+ 
+
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+</body>
+</html>
