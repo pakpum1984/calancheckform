@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>checkcalendar</title>
+    <title>calendar</title>
    <link rel="shortcut icon" href="https://pngimg.com/d/porsche_PNG10622.png" sizes="16x16 32x32 64x64" />
     <link rel="apple-touch-icon" href="https://pngimg.com/d/porsche_PNG10622.png" sizes="180x180" />
   
@@ -456,7 +456,7 @@
     };
       
        var googleScriptUrl = 'https://script.google.com/macros/s/AKfycbxVVUfSwT1cSTb2oZWo0wXVHthaSIW7L0RD22sNMpHv6tSbqsEpn0hmODDmrf0siKVG/exec'; 
-      
+      var googleScriptUrlbook = 'https://script.google.com/macros/s/AKfycbyyhPanSdQPBRFx5QpCbNtJm4WYRdhumqsVQqxHwFMh4j42L2fMCnCOcD8uoU42cs0C/exec'; 
       
          document.getElementById('togglePassword').addEventListener('click', function () {
         const passwordField = document.getElementById('password');
@@ -1287,13 +1287,13 @@ const isDuplicate = cachedEventsData.some(event => {
 formData.append('action', 'submitForm');
 formData.append('referer', referer);
 
-fetch(googleScriptUrl, {
+fetch(googleScriptUrlbook, {
   method: 'POST',
   body: formData
 })
-  .then(response => response.json())
+  .then(response => response.text())
   .then(data => {
-    if (data === true) {
+    if (data === "true") {
       // เคลียร์ฟอร์มหลังจากบันทึกข้อมูล
       document.getElementById('namecar').value = "";
       document.getElementById('nameloca').value = "";
